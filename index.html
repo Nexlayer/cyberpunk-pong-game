@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyberpunk Pong</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1 class="title">CYBERPUNK PONG</h1>
+            <div class="score-board">
+                <div class="score">
+                    <span class="player-label">PLAYER</span>
+                    <span id="player-score">0</span>
+                </div>
+                <div class="score">
+                    <span class="player-label">AI</span>
+                    <span id="ai-score">0</span>
+                </div>
+            </div>
+        </div>
+        
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        
+        <div class="controls">
+            <div class="control-info">
+                <p>Use <span class="key">W</span> and <span class="key">S</span> to move your paddle</p>
+                <p>Press <span class="key">SPACE</span> to start/pause</p>
+            </div>
+            <button id="startBtn" class="cyber-button">START GAME</button>
+            <button id="resetBtn" class="cyber-button">RESET</button>
+        </div>
+        
+        <div class="game-status" id="gameStatus"></div>
+    </div>
+    
+    <div class="background-effects">
+        <div class="grid-lines"></div>
+        <div class="scan-lines"></div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html> 
