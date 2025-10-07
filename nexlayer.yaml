@@ -1,0 +1,8 @@
+application:
+  name: cyberpunk-pong
+  pods:
+    - name: web
+      image: registry.nexlayer.io/nexlayer-mcp/nexlayer/cyberpunk-pong-game:f8c9d8e
+      path: /
+      servicePorts:
+        - 80
