@@ -179,7 +179,7 @@ class CyberpunkPong {
         }
 
         // AI difficulty increases with score difference
-        const difficulty = Math.min(1.2, 0.8 + (this.aiScore - this.playerScore) * 0.1);
+        const difficulty = Math.min(1.2, 0.8 + (this.playerScore - this.aiScore) * 0.1);
         this.aiPaddle.dy *= difficulty;
 
         this.aiPaddle.y += this.aiPaddle.dy;
