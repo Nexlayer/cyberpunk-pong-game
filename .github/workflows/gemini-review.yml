@@ -111,20 +111,30 @@ jobs:
       # Set the final status based on the review step's outcome
       # This step runs only if the previous steps succeed
       - name: 'Set status to success'
-        uses: 'google-github-actions/set-commit-status@v2'
+        uses: actions/github-script@v6
         with:
-          status: 'success'
-          context: 'Gemini AI Review'
-          description: '✅ Review complete'
-          token: '${{ secrets.GITHUB_TOKEN }}'
+          script: |
+            github.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: "success",
+              description: "✅ Review complete",
+              context: "Gemini AI Review"
+            })
 
       # Handle failures: Set status to "failure" if any step fails
       # The `if: failure()` condition ensures this only runs on error
       - name: 'Set status to failure'
         if: failure()
-        uses: 'google-github-actions/set-commit-status@v2'
+        uses: actions/github-script@v6
         with:
-          status: 'failure'
-          context: 'Gemini AI Review'
-          description: '⚠️ Review failed to run'
-          token: '${{ secrets.GITHUB_TOKEN }}'
+          script: |
+            github.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: "failure",
+              description: "⚠ ️ Review failed to run",
+              context: "Gemini AI Review"
+            })
