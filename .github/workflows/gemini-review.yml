@@ -125,6 +125,7 @@ jobs:
       # Handle failures: Set status to "failure" if any step fails
       # The `if: failure()` condition ensures this only runs on error
       - name: "Set commit status on Failure"
+        if: failure()
         uses: actions/github-script@v7
         with:
           script: |
