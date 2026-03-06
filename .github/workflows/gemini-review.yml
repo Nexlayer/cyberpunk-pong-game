@@ -129,8 +129,9 @@ jobs:
               sha: prSha || context.sha,
               state: "success",
               description: "✅ Review complete",
-              context: "Gemini AI Review"
-            })
+              context: "Gemini AI Review",
+              target_url: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${context.runId}`
+            });
 
       # Handle failures: Set status to "failure" if any step fails
       # The `if: failure()` condition ensures this only runs on error
