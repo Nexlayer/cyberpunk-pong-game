@@ -120,8 +120,6 @@ jobs:
               description: "✅ Review complete",
               context: "Gemini AI Review"
             })
-              context: "Gemini AI Review"
-            })
 
       # Handle failures: Set status to "failure" if any step fails
       # The `if: failure()` condition ensures this only runs on error
@@ -134,7 +132,5 @@ jobs:
               sha: context.payload.pull_request?.head.sha || context.sha,
               state: "failure",
               description: "⚠️ Review failed to run",
-              context: "Gemini AI Review"
-            })
               context: "Gemini AI Review"
             })
