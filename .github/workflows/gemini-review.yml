@@ -146,6 +146,9 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 pull_number: context.payload.issue.number
+              });
+              prSha = pr.head.sha;
+            }
             await github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -155,6 +158,3 @@ jobs:
               context: "Gemini AI Review",
               target_url: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${context.runId}`
             });
-              description: "⚠️ Review failed to run",
-              context: "Gemini AI Review"
-            })
