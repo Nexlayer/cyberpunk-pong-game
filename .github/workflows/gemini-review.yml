@@ -114,10 +114,10 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            github.repos.createCommitStatus({
+            github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              sha: context.sha,
+              sha: context.payload.pull_request?.head.sha || context.sha,
               state: "success",
               description: "✅ Review complete",
               context: "Gemini AI Review"
