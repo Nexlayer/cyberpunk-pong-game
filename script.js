@@ -8,6 +8,7 @@ class CyberpunkPong {
         // Game state
         this.gameRunning = false;
         this.gamePaused = false;
+        this.animationFrameId = null;
         
         // Scores
         this.playerScore = 0;
@@ -94,6 +95,10 @@ class CyberpunkPong {
     }
     
     startGame() {
+        if (this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
+            this.animationFrameId = null;
+        }
         this.gameRunning = true;
         this.gamePaused = false;
         this.startBtn.textContent = 'PAUSE';
@@ -102,6 +107,10 @@ class CyberpunkPong {
     }
     
     resetGame() {
+        if (this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
+            this.animationFrameId = null;
+        }
         this.gameRunning = false;
         this.gamePaused = false;
         this.playerScore = 0;
@@ -122,17 +131,19 @@ class CyberpunkPong {
     }
     
     gameLoop() {
-        if (!this.gameRunning || this.gamePaused) return;
-        
+        if (!this.gameRunning || this.gamePaused) {
+            this.animationFrameId = null;
+            return;
+        }
+
         this.update();
         this.draw();
-        requestAnimationFrame(() => this.gameLoop());
+        this.animationFrameId = requestAnimationFrame(() => this.gameLoop());
     }
     
     update() {
         this.updatePaddles();
         this.updateBall();
-        this.updateAI();
         this.updateParticles();
         this.updateTrail();
     }
@@ -148,7 +159,13 @@ class CyberpunkPong {
         }
         
         this.playerPaddle.y += this.playerPaddle.dy;
-        
+
+        // Keep player paddle in bounds
+        if (this.playerPaddle.y < 0) this.playerPaddle.y = 0;
+        if (this.playerPaddle.y > this.height - this.paddleHeight) {
+            this.playerPaddle.y = this.height - this.paddleHeight;
+        }
+
         // AI paddle movement
         const aiCenter = this.aiPaddle.y + this.paddleHeight / 2;
         const ballCenter = this.ball.y;
@@ -160,7 +177,11 @@ class CyberpunkPong {
         } else {
             this.aiPaddle.dy = 0;
         }
-        
+
+        // AI difficulty increases with score difference
+        const difficulty = Math.min(1.2, 0.8 + (this.aiScore - this.playerScore) * 0.1);
+        this.aiPaddle.dy *= difficulty;
+
         this.aiPaddle.y += this.aiPaddle.dy;
         
         // Keep AI paddle in bounds
@@ -180,25 +201,35 @@ class CyberpunkPong {
             this.createParticles(this.ball.x, this.ball.y);
         }
         
-        // Ball collision with paddles
-        if (this.checkPaddleCollision(this.playerPaddle) || this.checkPaddleCollision(this.aiPaddle)) {
-            this.ball.dx = -this.ball.dx;
+        // Ball collision with player paddle
+        if (this.checkPaddleCollision(this.playerPaddle)) {
+            this.ball.x = this.playerPaddle.x + this.paddleWidth;
+            this.ball.dx = Math.abs(this.ball.dx);
             this.ball.dy += (Math.random() - 0.5) * 2;
             this.createParticles(this.ball.x, this.ball.y);
             this.createTrailEffect();
         }
-        
+
+        // Ball collision with AI paddle
+        if (this.checkPaddleCollision(this.aiPaddle)) {
+            this.ball.x = this.aiPaddle.x - this.ball.size;
+            this.ball.dx = -Math.abs(this.ball.dx);
+            this.ball.dy += (Math.random() - 0.5) * 2;
+            this.createParticles(this.ball.x, this.ball.y);
+            this.createTrailEffect();
+        }
+
         // Ball out of bounds
         if (this.ball.x <= 0) {
             this.aiScore++;
             this.updateScores();
+            this.createParticles(0, this.ball.y);
             this.resetBall();
-            this.createParticles(this.ball.x, this.ball.y);
         } else if (this.ball.x >= this.width) {
             this.playerScore++;
             this.updateScores();
+            this.createParticles(this.width, this.ball.y);
             this.resetBall();
-            this.createParticles(this.ball.x, this.ball.y);
         }
     }
     
@@ -207,12 +238,6 @@ class CyberpunkPong {
                this.ball.x + this.ball.size > paddle.x &&
                this.ball.y < paddle.y + this.paddleHeight &&
                this.ball.y + this.ball.size > paddle.y;
-    }
-    
-    updateAI() {
-        // AI difficulty increases with score
-        const difficulty = Math.min(1.2, 0.8 + (this.aiScore - this.playerScore) * 0.1);
-        this.aiPaddle.dy *= difficulty;
     }
     
     createParticles(x, y) {
@@ -264,8 +289,12 @@ class CyberpunkPong {
     }
     
     draw() {
-        // Clear canvas
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+        // Clear canvas — motion blur when playing, full clear otherwise
+        if (this.gameRunning && !this.gamePaused) {
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+        } else {
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+        }
         this.ctx.fillRect(0, 0, this.width, this.height);
         
         // Draw center line
